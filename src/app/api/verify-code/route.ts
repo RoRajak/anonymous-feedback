@@ -1,11 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/models/User";
-import { verifySchema } from "@/Schemas/verifySchema";
-import { z } from "zod";
 
-const VerifyCodeSchema = z.object({
-  code: verifySchema,
-});
 
 export async function POST(request: Request) {
   await dbConnect();
