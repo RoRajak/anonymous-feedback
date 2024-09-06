@@ -13,39 +13,42 @@ export async function POST(request: Request) {
       return Response.json(
         {
           success: false,
-          message: "Not authenticated",
+          message: "User not found",
         },
         {
           status: 404,
         }
       );
     }
-    if (user.isAcceptingMessage) {
-        return Response.json({
-            success:false,
-            message:"User not accepting the messages"
-        },{
-            status:403
-        })
+    if (!user.isAcceptingMessage) {
+      return Response.json(
+        {
+          success: false,
+          message: "User not accepting the messages",
+        },
+        {
+          status: 403,
+        }
+      );
     }
-    const  newMessage={content,createdAt:new Date()}
+    const newMessage = { content, createdAt: new Date() };
     user.messages.push(newMessage as Message);
-    await user.save()
-    return Response.json({
-        success:false,
-        message:"Failed to update user status to accept messages"
-    },{
-        status:500
-    })
+    await user.save();
+    return Response.json(
+      { message: "Message sent successfully", success: true },
+      { status: 201 }
+    );
   } catch (error) {
-    console.log("error adding messages",error);
-    
-    return Response.json({
-        success:false,
-        message:"internal server error"
-    },{
-        status:500
-    })
+    console.log("error adding messages", error);
 
+    return Response.json(
+      {
+        success: false,
+        message: "internal server error",
+      },
+      {
+        status: 500,
+      }
+    );
   }
 }
