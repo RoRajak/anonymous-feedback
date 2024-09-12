@@ -108,7 +108,7 @@ function SignIN() {
       </Form>
       <div>
         <p>Don&apos;have an account?{' '}
-          <Link href={"/signin"} className="text-blue-600 hover:text-blue-800">
+          <Link href={"/signup"} className="text-blue-600 hover:text-blue-800">
           Sign up
           </Link>
         </p>
