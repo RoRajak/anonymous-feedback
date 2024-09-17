@@ -2,31 +2,40 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter,useSearchParams } from "next/navigation";
 import axios, { AxiosError } from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
 import { useForm } from "react-hook-form";
-import { verifySchema } from "@/Schemas/verifySchema";
+import { resetPasswordSchema } from "@/Schemas/resetPasswordSchema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 
-function VerifyCode() {
+function ResetPassword() {
   const [isSubmitting,setIsSubmitting]=useState(false)
+  const [token, setToken] = useState<string>("");
   const { toast } = useToast();
   const router = useRouter();
   const params=useParams<{username:string}>();
-  const form = useForm<z.infer<typeof verifySchema>>({
-    resolver: zodResolver(verifySchema),
+  const searchParams=useSearchParams();
+  const form = useForm<z.infer<typeof resetPasswordSchema>>({
+    resolver: zodResolver(resetPasswordSchema),
   });
-  const onSubmit = async (data: z.infer<typeof verifySchema>) => {
+
+  useEffect(() => {
+    const urlToken = searchParams ? searchParams.get('token') : null;
+    setToken(urlToken || "");
+    
+}, [searchParams]);
+  const onSubmit = async (data: z.infer<typeof resetPasswordSchema>) => {
     try {
       setIsSubmitting(true)
-      const response = await axios.post(`/api/verify-code`, {
-        username:params.username,
-        code:data.code
+      const response = await axios.post(`/api/verify-token`, {
+        username:params?.username,
+        password:data.password,
+        token:token
       });
       toast({
         title: "success",
@@ -34,11 +43,11 @@ function VerifyCode() {
       });
       router.push("/signin")
     } catch (error) {
-      console.log("Error in SigninUP", error);
+      console.log("Error in resetting passowrd", error);
       const axiosError = error as AxiosError<ApiResponse>;
       let errorMessages = axiosError.response?.data.message;
       toast({
-        title: "Verfication failed",
+        title: "token Verfication failed",
         description: errorMessages,
         variant: "destructive",
       });
@@ -53,10 +62,10 @@ function VerifyCode() {
       <div className=" w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
-            Verify your email
+          {params?.username ? `${params.username} Greetings!!` : "Greetings!!"}
           </h1>
           <p className="mb-4">
-            Enter the Verfication code that sent to your email
+            please reset your password below
           </p>
         </div>
       
@@ -64,12 +73,12 @@ function VerifyCode() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="code"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Verification code</FormLabel>
+                    <FormLabel>Reset Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="verify code" {...field} />
+                      <Input type="password" placeholder="reset password" {...field} />
                     </FormControl>
                    
                     <FormMessage />
@@ -93,4 +102,4 @@ function VerifyCode() {
   );
 }
 
-export default VerifyCode;
+export default ResetPassword;

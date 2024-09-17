@@ -98,9 +98,9 @@ function Page() {
       });
       setValue("acceptMessages", !acceptMessages);
       toast({
-        title: "Error",
+        
         description: response.data.message,
-        variant: "destructive",
+        variant: "default",
       });
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
@@ -111,12 +111,12 @@ function Page() {
       });
     }
   };
-
-  const { username } = session?.user;
-
+  if (!session || !session.user) {
+    return <div>Please login</div>;
+  }
+  const username = session?.user?.username;
   const baseUrl = `${window.location.protocol}/${window.location.host}`;
-
-  const profileUrl = `${baseUrl}/${username}`;
+  const profileUrl = username ? `${baseUrl}/u/${username}` : "";
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(profileUrl);
@@ -126,9 +126,9 @@ function Page() {
     });
   };
 
-  if (!session || !session.user) {
-    return <div>Please login</div>;
-  }
+  
+
+  
 
   return (
     <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-white rounded w-full max-w-6xl">
