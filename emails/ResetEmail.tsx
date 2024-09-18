@@ -18,7 +18,7 @@ export default function ResetEmail({
   username,
   token,
 }: ResetEmailProps) {
-  const link = `http://localhost:3000/reset-password/${username}?token=${token}`;
+  const link = `${process.env.DOMAIN}/reset-password/${username}?token=${token}`;
   
   return (
     <Html lang="en" dir="ltr">
